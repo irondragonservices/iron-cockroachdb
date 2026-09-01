@@ -26,6 +26,11 @@ RUN adduser -s /bin/true -u 1000 -D -h /cockroach app \
 # arm64 manifest.
 FROM cockroachdb/cockroach:v26.2.6 AS cdb
 
+# Fail the whole pipeline on the first failure. Without this the `ldd | awk |
+# while read` below reports success even when ldd finds nothing, and the image
+# is built missing every library it was supposed to carry.
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Copy the binary and everything it links against, preserving paths, so the
 # dynamic loader finds them at the same absolute paths inside scratch.
 #
