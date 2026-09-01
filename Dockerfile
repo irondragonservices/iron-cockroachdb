@@ -4,7 +4,8 @@
 FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS builder
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache ca-certificates tzdata
+RUN apk upgrade --no-cache \
+  && apk add --no-cache ca-certificates tzdata
 
 RUN adduser -s /bin/true -u 1000 -D -h /cockroach app \
   && sed -i -r "/^(app|root)/!d" /etc/group /etc/passwd \
@@ -25,6 +26,11 @@ RUN adduser -s /bin/true -u 1000 -D -h /cockroach app \
 # the same vendor, already fetched over an authenticated channel, and it has an
 # arm64 manifest.
 FROM cockroachdb/cockroach:v26.2.6 AS cdb
+
+# Fail the whole pipeline on the first failure. Without this the `ldd | awk |
+# while read` below reports success even when ldd finds nothing, and the image
+# is built missing every library it was supposed to carry.
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Copy the binary and everything it links against, preserving paths, so the
 # dynamic loader finds them at the same absolute paths inside scratch.
