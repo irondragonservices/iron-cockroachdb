@@ -25,7 +25,7 @@ RUN adduser -s /bin/true -u 1000 -D -h /cockroach app \
 # architecture other than amd64. The official image is the same artefact from
 # the same vendor, already fetched over an authenticated channel, and it has an
 # arm64 manifest.
-FROM cockroachdb/cockroach:v26.2.6@sha256:c0838fd4db940b7dedb590211ee3cd229b75d3b49ce466760454a282b98641ae AS cdb
+FROM cockroachdb/cockroach:v26.3.1@sha256:204f131510c78393adb02345f289a8dbb32e1491e26cc92b6c7751f3b97be3c5 AS cdb
 
 # Fail the whole pipeline on the first failure. Without this the `ldd | awk |
 # while read` below reports success even when ldd finds nothing, and the image
